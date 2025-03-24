@@ -10,6 +10,8 @@ export interface TimelineEvent {
   characters?: string[];
   source: string;
   century?: string; // Adicionado para eventos sem data precisa
+  startYear?: number; // Adicionado para corrigir erros de TypeScript
+  endMonth?: number; // Adicionado para corrigir erros de TypeScript
 }
 
 export interface TimelinePeriod {
@@ -56,4 +58,10 @@ export interface SourceInfo {
   author: string;
   color: string;
   description?: string;
+}
+
+// Adicionar interface Event para brasil_antes_cabral.ts
+export interface Event {
+  year: number;
+  description: string;
 }
