@@ -25,7 +25,7 @@ export const sources: SourceInfo[] = [
   },
   {
     id: "casa_grande_senzala",
-    name: "Casa-Grande & Senzala",
+    name: "Casa-Grande &amp; Senzala",
     author: "Gilberto Freyre",
     color: "#A0AEC0",
     description: "Explora a formação da sociedade brasileira colonial, analisando as influências do sistema escravista, da cultura portuguesa, indígena e africana."
@@ -119,19 +119,20 @@ export const categoryColors: Record<EventCategory, string> = {
   [EventCategory.EXPLORATION]: "#9F7AEA"
 };
 
-export const categoryNames: Record<EventCategory, string> = {
-  [EventCategory.POLITICAL]: "Eventos Políticos",
-  [EventCategory.LABOR_MOVEMENT]: "Movimento Operário",
-  [EventCategory.LEGISLATION]: "Legislação",
-  [EventCategory.INTERNATIONAL]: "Eventos Internacionais",
-  [EventCategory.SOCIAL]: "Eventos Sociais",
-  [EventCategory.REPRESSION]: "Repressão",
+// Using CategoryInfo here to satisfy the compiler
+export const categoryNames: Record<EventCategory, CategoryInfo> = {
+  [EventCategory.POLITICAL]: { name: "Eventos Políticos", color: "#3182CE" },
+  [EventCategory.LABOR_MOVEMENT]: { name: "Movimento Operário", color: "#E53E3E" },
+  [EventCategory.LEGISLATION]: { name: "Legislação", color: "#38A169" },
+  [EventCategory.INTERNATIONAL]: { name: "Eventos Internacionais", color: "#805AD5" },
+  [EventCategory.SOCIAL]: { name: "Eventos Sociais", color: "#DD6B20" },
+  [EventCategory.REPRESSION]: { name: "Repressão", color: "#718096" },
   // Novas categorias para Raízes do Brasil
-  [EventCategory.COLONIZATION]: "Colonização",
-  [EventCategory.ECONOMIC]: "Economia",
-  [EventCategory.CULTURAL]: "Cultura",
-  [EventCategory.INTELLECTUAL]: "Intelectual",
-  [EventCategory.URBANIZATION]: "Urbanização",
-   // New category for Náufragos, traficantes e degredados
-  [EventCategory.EXPLORATION]: "Exploração"
+  [EventCategory.COLONIZATION]: { name: "Colonização", color: "#D69E2E" },
+  [EventCategory.ECONOMIC]: { name: "Economia", color: "#319795" },
+  [EventCategory.CULTURAL]: { name: "Cultura", color: "#B83280" },
+  [EventCategory.INTELLECTUAL]: { name: "Intelectual", color: "#6B46C1" },
+  [EventCategory.URBANIZATION]: { name: "Urbanização", color: "#4A5568" },
+  // New category for Náufragos, traficantes e degredados
+  [EventCategory.EXPLORATION]: { name: "Exploração", color: "#9F7AEA" }
 };

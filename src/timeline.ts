@@ -143,7 +143,7 @@ export class Timeline {
 
 
     // Create SVG
-    this.svg = d3.select(container)
+    this.svg = d3.select<SVGSVGElement, unknown>(container) // Specify generic types here
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
@@ -154,7 +154,7 @@ export class Timeline {
         .on("end", () => this.svg.style("cursor", "grab")));
 
     // Create tooltip
-    this.tooltip = d3.select(container)
+    this.tooltip = d3.select<HTMLDivElement, unknown>(container) // Specify generic types here
       .append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
@@ -196,7 +196,7 @@ export class Timeline {
 
   private dragged(event: any): void {
     const [startDate, endDate] = this.xScale.domain();
-    const domainRange = endDate.getTime() - startDate.getTime();
+    // const domainRange = endDate.getTime() - startDate.getTime(); // Removed unused variable
 
     const delta = this.xScale.invert(-event.dx).getTime() - this.xScale.invert(0).getTime();
 
