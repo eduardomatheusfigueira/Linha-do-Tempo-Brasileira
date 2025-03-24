@@ -1,4 +1,4 @@
-import { EventCategory, SourceInfo } from './types';
+import { CategoryInfo, EventCategory, SourceInfo } from './types';
 
 // Informações sobre as fontes
 export const sources: SourceInfo[] = [
@@ -34,7 +34,7 @@ export const sources: SourceInfo[] = [
     id: "naufragos_traficantes",
     name: "Náufragos, traficantes e degredados",
     author: "Eduardo Bueno",
-    color: "#9F7AEA",
+    color: "#9F7AEA", // Example color, please choose a better one if needed
     description: "Livro sobre as primeiras expedições no Brasil, explorando o período inicial da presença europeia e as interações com os nativos."
   },
   {
@@ -48,14 +48,14 @@ export const sources: SourceInfo[] = [
     id: "reinaldo_jose_lopes",
     name: "Reinaldo Jose Lopes",
     author: "Reinaldo Jose Lopes",
-    color: "#A21CAF",
+    color: "#A21CAF", // Example color
     description: "Fonte: Reinaldo Jose Lopes"
   },
   {
     id: "darcy_ribeiro",
     name: "Darcy Ribeiro",
     author: "Darcy Ribeiro",
-    color: "#EA580C",
+    color: "#EA580C", // Example color
     description: "Fonte: Darcy Ribeiro"
   },
   {
@@ -83,14 +83,14 @@ export const sources: SourceInfo[] = [
     id: "eduardo_bueno",
     name: "Eduardo Bueno",
     author: "Eduardo Bueno",
-    color: "#059669",
+    color: "#059669", // Example color
     description: "Fonte: Eduardo Bueno"
   },
   {
     id: "sergio_buarque",
     name: "Sérgio Buarque de Holanda",
     author: "Sérgio Buarque de Holanda",
-    color: "#06B6D4",
+    color: "#06B6D4", // Example color
     description: "Fonte: Sérgio Buarque de Holanda"
   },
   {
@@ -109,11 +109,13 @@ export const categoryColors: Record<EventCategory, string> = {
   [EventCategory.INTERNATIONAL]: "#805AD5",
   [EventCategory.SOCIAL]: "#DD6B20",
   [EventCategory.REPRESSION]: "#718096",
+  // Novas categorias para Raízes do Brasil
   [EventCategory.COLONIZATION]: "#D69E2E",
   [EventCategory.ECONOMIC]: "#319795",
   [EventCategory.CULTURAL]: "#B83280",
   [EventCategory.INTELLECTUAL]: "#6B46C1",
   [EventCategory.URBANIZATION]: "#4A5568",
+  // New category for Náufragos, traficantes e degredados
   [EventCategory.EXPLORATION]: "#9F7AEA"
 };
 
@@ -124,10 +126,12 @@ export const categoryNames: Record<EventCategory, string> = {
   [EventCategory.INTERNATIONAL]: "Eventos Internacionais",
   [EventCategory.SOCIAL]: "Eventos Sociais",
   [EventCategory.REPRESSION]: "Repressão",
+  // Novas categorias para Raízes do Brasil
   [EventCategory.COLONIZATION]: "Colonização",
   [EventCategory.ECONOMIC]: "Economia",
   [EventCategory.CULTURAL]: "Cultura",
   [EventCategory.INTELLECTUAL]: "Intelectual",
   [EventCategory.URBANIZATION]: "Urbanização",
+   // New category for Náufragos, traficantes e degredados
   [EventCategory.EXPLORATION]: "Exploração"
 };

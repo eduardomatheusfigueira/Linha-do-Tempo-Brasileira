@@ -37,7 +37,7 @@ const events = [
 const periods = [
   ...invencaoPeriods,
   ...raizesPeriods,
-  ...capitaesBrasilEvents,
+  ...capitaesBrasilPeriods,
   ...casaGrandePeriods,
   ...naufragosPeriods,
   ...urbanizacaoPeriods,
@@ -550,22 +550,22 @@ export class Timeline {
         .ticks(d3.timeYear.every(Math.max(1, Math.floor(50 / this.zoomLevel)))));
 
     // Update periods
-    this.svg.selectAll<SVGRectElement, TimelinePeriod>('.period-bg')
-      .attr('x', (d: TimelinePeriod) => this.xScale(new Date(d.startYear, 0, 1)))
-      .attr('width', (d: TimelinePeriod) => {
+    this.svg.selectAll('.period-bg')
+      .attr('x', (d: any) => this.xScale(new Date(d.startYear, 0, 1)))
+      .attr('width', (d: any) => {
         const start = this.xScale(new Date(d.startYear, 0, 1));
         const end = this.xScale(new Date(d.endYear, 11, 31));
         return Math.max(0, end - start);
       })
-      .classed('prehistoric-period', (d: TimelinePeriod) => d.startYear < 0);
+      .classed('prehistoric-period', (d: any) => d.startYear < 0);
 
-    this.svg.selectAll<SVGTextElement, TimelinePeriod>('.period-label')
-      .attr('x', (d: TimelinePeriod) => {
+    this.svg.selectAll('.period-label')
+      .attr('x', (d: any) => {
         const start = this.xScale(new Date(d.startYear, 0, 1));
         const end = this.xScale(new Date(d.endYear, 11, 31));
         return start + (end - start) / 2;
       })
-      .style('opacity', (d: TimelinePeriod) => {
+      .style('opacity', (d: any) => {
         const start = this.xScale(new Date(d.startYear, 0, 1));
         const end = this.xScale(new Date(d.endYear, 11, 31));
         return (end - start) > 50 ? 1 : 0; // Hide labels if period is too small
@@ -777,7 +777,7 @@ export class Timeline {
       .style('top', `${event.pageY - 10}px`)
       .html(`
         <div class="tooltip-header" style="border-color: ${sources.find(s => s.name === d.source)?.color || '#ccc'}">
-          <h4>${d.startYear < 0 ? Math.abs(d.startYear) + ' a.C.' : d.startYear} - ${d.endYear < 0 ? Math.abs(d.endYear) + ' a.C.' : d.endYear} : ${d.title}</h4>
+          <h4>${d.startYear < 0 ? Math.abs(d.startYear) + ' a.C.' : d.startYear} - ${d.endYear < 0 ? Math.abs(d.endYear) + ' a.C.' : d.endYear}: ${d.title}</h4>
           <div class="tooltip-source">Fonte: ${d.source}</div>
         </div>
         <p>${d.description || 'Sem descrição disponível'}</p>
@@ -833,7 +833,7 @@ export class Timeline {
 
 
     // Draw events
-    const eventGroups = g.selectAll<SVGGElement, TimelineEvent>('.event')
+    const eventGroups = g.selectAll('.event')
       .data(visibleEvents)
       .enter()
       .append('g')
@@ -1201,16 +1201,16 @@ export class Timeline {
 
   private updateEventVisibility(): void {
     // Filter by source first
-    this.svg.selectAll<SVGGElement, TimelineEvent>('.event')
-      .style('display', (d: TimelineEvent): 'none' | 'block' => { // Explicitly define return type
+    this.svg.selectAll('.event')
+      .style('display', (d: TimelineEvent) => { // Change opacity to display
         const sourceId = sources.find(s => s.name === d.source)?.id;
         return (!sourceId || !this.selectedSources.has(sourceId)) ? 'none' : 'block'; // Use 'none' to hide and 'block' to show
       });
 
     // Then filter by character if any are selected
     if (this.selectedCharacters.size > 0) {
-      this.svg.selectAll<SVGGElement, TimelineEvent>('.event')
-        .style('display', (d: TimelineEvent): 'none' | 'block' => { // Explicitly define return type
+      this.svg.selectAll('.event')
+        .style('display', (d: TimelineEvent) => {
           // If already hidden by source filter, keep it hidden
           const sourceId = sources.find(s => s.name === d.source)?.id;
           if (!sourceId || !this.selectedSources.has(sourceId)) {
@@ -1237,8 +1237,8 @@ export class Timeline {
   }
 
   private updatePeriodVisibility(): void {
-    this.svg.selectAll<SVGRectElement | SVGTextElement, TimelinePeriod>('.period-bg, .period-label')
-      .style('display', (d: TimelinePeriod): 'none' | 'block' => { // Explicitly define return type
+    this.svg.selectAll('.period-bg, .period-label')
+      .style('display', (d: TimelinePeriod) => {
         const sourceId = sources.find(s => s.name === d.source)?.id;
         return (!sourceId || !this.selectedSources.has(sourceId)) ? 'none' : 'block';
       });
