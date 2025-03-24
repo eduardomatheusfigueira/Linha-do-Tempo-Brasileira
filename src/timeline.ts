@@ -37,7 +37,7 @@ const events = [
 const periods = [
   ...invencaoPeriods,
   ...raizesPeriods,
-  ...capitaesBrasilPeriods,
+  ...capitaesBrasilEvents,
   ...casaGrandePeriods,
   ...naufragosPeriods,
   ...urbanizacaoPeriods,
@@ -1202,7 +1202,7 @@ export class Timeline {
   private updateEventVisibility(): void {
     // Filter by source first
     this.svg.selectAll<SVGGElement, TimelineEvent>('.event')
-      .style('display', (d: TimelineEvent) => { // Change opacity to display
+      .style('display', (d: TimelineEvent): 'none' | 'block' => { // Explicitly define return type
         const sourceId = sources.find(s => s.name === d.source)?.id;
         return (!sourceId || !this.selectedSources.has(sourceId)) ? 'none' : 'block'; // Use 'none' to hide and 'block' to show
       });
@@ -1210,7 +1210,7 @@ export class Timeline {
     // Then filter by character if any are selected
     if (this.selectedCharacters.size > 0) {
       this.svg.selectAll<SVGGElement, TimelineEvent>('.event')
-        .style('display', (d: TimelineEvent) => {
+        .style('display', (d: TimelineEvent): 'none' | 'block' => { // Explicitly define return type
           // If already hidden by source filter, keep it hidden
           const sourceId = sources.find(s => s.name === d.source)?.id;
           if (!sourceId || !this.selectedSources.has(sourceId)) {
@@ -1238,7 +1238,7 @@ export class Timeline {
 
   private updatePeriodVisibility(): void {
     this.svg.selectAll<SVGRectElement | SVGTextElement, TimelinePeriod>('.period-bg, .period-label')
-      .style('display', (d: TimelinePeriod) => {
+      .style('display', (d: TimelinePeriod): 'none' | 'block' => { // Explicitly define return type
         const sourceId = sources.find(s => s.name === d.source)?.id;
         return (!sourceId || !this.selectedSources.has(sourceId)) ? 'none' : 'block';
       });

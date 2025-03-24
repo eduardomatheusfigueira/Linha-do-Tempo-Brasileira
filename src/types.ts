@@ -45,10 +45,6 @@ export enum EventCategory {
   EXPLORATION = "exploration" // Adicionar EXPLORATION
 }
 
-export interface CategoryInfo {
-  name: string;
-  color: string;
-}
 
 export interface SourceInfo {
   id: string;
