@@ -143,18 +143,18 @@ export class Timeline {
 
 
     // Create SVG
-    this.svg = d3.select<SVGSVGElement, unknown>(container) // Specify generic types here
+    this.svg = d3.select<HTMLElement, unknown>(`#${containerId}`)
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
       .attr('class', 'timeline-svg')
-      .call(d3.drag()
+      .call(d3.drag<SVGSVGElement, unknown>() // Add type argument to d3.drag
         .on("start", () => this.svg.style("cursor", "grabbing"))
         .on("drag", this.dragged.bind(this))
         .on("end", () => this.svg.style("cursor", "grab")));
 
     // Create tooltip
-    this.tooltip = d3.select<HTMLDivElement, unknown>(container) // Specify generic types here
+    this.tooltip = d3.select<HTMLElement, unknown>(`#${containerId}`)
       .append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
@@ -540,14 +540,18 @@ export class Timeline {
 
   private updateTimeline(): void {
     // Update axis
-    this.svg.select('.axis')
-      .attr('transform', `translate(0, ${this.innerHeight})`) // Position axis at the bottom
-      .call(d3.axisBottom(this.xScale)
-        .tickFormat((d: Date) => {
-          const year = d.getFullYear();
-          return year < 0 ? `${Math.abs(year)} a.C.` : `${year}`;
-        })
-        .ticks(d3.timeYear.every(Math.max(1, Math.floor(50 / this.zoomLevel)))));
+    const axisSelection = this.svg.select<SVGGElement>('.axis');
+    if (axisSelection.node()) { // Check if selection is not empty
+      axisSelection
+        .attr('transform', `translate(0, ${this.innerHeight})`) // Position axis at the bottom
+        .call(d3.axisBottom(this.xScale)
+          .tickFormat((d: Date | d3.NumberValue, _index: number) => {
+            const date = d instanceof Date ? d : new Date(d.valueOf());
+            const year = date.getFullYear();
+            return year < 0 ? `${Math.abs(year)} a.C.` : `${year}`;
+          })
+          .ticks(d3.timeYear.every(Math.max(1, Math.floor(50 / this.zoomLevel)))!));
+    }
 
     // Update periods
     this.svg.selectAll('.period-bg')
@@ -591,17 +595,18 @@ export class Timeline {
     this.drawYearLines();
 
     // Draw x-axis
-    const xAxis = d3.axisBottom(this.xScale)
-      .tickFormat((d: Date) => {
-        const year = d.getFullYear();
-          return year < 0 ? `${Math.abs(year)} a.C.` : `${year}`;
+    const xAxisGenerator = d3.axisBottom(this.xScale)
+      .tickFormat((d: Date | d3.NumberValue, _index: number) => {
+        const date = d instanceof Date ? d : new Date(d.valueOf());
+        const year = date.getFullYear();
+        return year < 0 ? `${Math.abs(year)} a.C.` : `${year}`;
       })
-      .ticks(d3.timeYear.every(50));
+      .ticks(d3.timeYear.every(50)!);
 
     g.append('g')
       .attr('class', 'axis')
       .attr('transform', `translate(0, ${this.innerHeight})`) // Position axis at the bottom
-      .call(xAxis);
+      .call(xAxisGenerator);
 
     // Add axis label
     g.append('text')
@@ -614,7 +619,7 @@ export class Timeline {
 
   private drawYearLines(): void {
     const g = this.svg.select('g'); // Select the existing main group
-    const ticks = this.xScale.ticks(d3.timeYear.every(Math.max(1, Math.floor(50 / this.zoomLevel))));
+    const ticks = this.xScale.ticks(d3.timeYear.every(Math.max(1, Math.floor(50 / this.zoomLevel)))!);
 
     const yearLines = g.selectAll('.year-line')
       .data(ticks)
@@ -803,7 +808,7 @@ export class Timeline {
     // Filter events based on current view
     const currentDomain = this.xScale.domain() as [Date, Date];
     const visibleEvents = events.filter(event => {
-      const eventDate = event.century ? new Date(1, 0, 1) : new Date(event.year, event.month || 0, 1);
+      const eventDate = event.century ? new Date(1, 0, 1) : new Date(event.year ?? 0, event.month ?? 0, 1);
       const eventEndDate = event.endYear ? new Date(event.endYear, 11, 31) : event.endYear ? new Date(event.endYear, 11, 31) : eventDate;
 
       if (event.century) {
@@ -839,8 +844,9 @@ export class Timeline {
       .append('g')
       .attr('class', 'event')
       .attr('transform', d => {
-        const eventYear = d.century ? this.getYearFromCentury(d.century.split(' ')[0]) : d.year;
-        const x = this.xScale(new Date(eventYear, d.month || 0, 1));
+        const eventYear = (d.century ? this.getYearFromCentury(d.century.split(' ')[0]) : d.year) ?? 0; // Ensure eventYear is a number
+        const eventMonth = (d as TimelineEvent).month;
+        const x = this.xScale(new Date(eventYear, eventMonth === undefined ? 0 : eventMonth, 1));
         const y = categoryYPositions[d.category]; // Use category-based Y position
         return `translate(${x}, ${y})`;
       });
@@ -864,7 +870,8 @@ export class Timeline {
         const eventGroup = d3.select(nodes[index]); // Select the current event group
         const startX = 0; // X position is relative to the event group
         // Calculate the horizontal distance based on the difference in years
-        const endX = this.xScale(new Date(d.endYear!, 11, 31)) - this.xScale(new Date(d.year, d.month || 0, 1));
+        const eventEndMonth = (d as TimelineEvent).month;
+        const endX = this.xScale(new Date(d.endYear!, 11, 31)) - this.xScale(new Date(d.year ?? 0, eventEndMonth === undefined ? 0 : eventEndMonth, 1));
 
         eventGroup.append('line')
           .attr('x1', startX)
@@ -887,7 +894,7 @@ export class Timeline {
         .attr('text-anchor', 'middle')
         .attr('font-size', '9px')
         .attr('fill', '#666')
-        .text(d => d.century ? d.century : d.year);
+        .text(d => d.century ? d.century : (d.year !== undefined ? (d.year < 0 ? `${Math.abs(d.year)} a.C.` : d.year.toString()) : ''));
     }
 
     this.updateEventVisibility();
@@ -914,14 +921,14 @@ export class Timeline {
       .style('top', `${event.pageY - 10}px`)
       .html(`
         <div class="tooltip-header" style="border-color: ${categoryColors[d.category]}">
-          <h4>${d.century ? d.century : `${d.year < 0 ? Math.abs(d.year) + ' a.C.' : d.year}${d.endYear ? ` - ${d.endYear < 0 ? Math.abs(d.endYear) + ' a.C.' : d.endYear}` : ''}`}: ${d.title}</h4>
+          <h4>${d.century ? d.century : `${(d.year ?? 0) < 0 ? Math.abs(d.year ?? 0) + ' a.C.' : (d.year ?? 0)}${d.endYear ? ` - ${(d.endYear ?? 0) < 0 ? Math.abs(d.endYear ?? 0) + ' a.C.' : (d.endYear ?? 0)}` : ''}`}: ${d.title}</h4>
           <div class="tooltip-source">Fonte: ${d.source}</div>
         </div>
         <p>${d.description}</p>
         ${relatedCharacters.length > 0 ?
           `<div class="characters">Personagens: ${relatedCharacters.map(c => c.name).join(', ')}</div>` :
           ''}
-        <div class="tooltip-category">Categoria: ${categoryNames[d.category]}</div>
+        <div class="tooltip-category">Categoria: ${categoryNames[d.category].name}</div>
       `);
   }
 
@@ -952,7 +959,7 @@ export class Timeline {
 
       const text = document.createElement('div');
       text.className = 'legend-text';
-      text.textContent = name;
+      text.textContent = name.name; // Access the name property of CategoryInfo
 
       legendItem.appendChild(colorBox);
       legendItem.appendChild(text);
@@ -1201,31 +1208,31 @@ export class Timeline {
 
   private updateEventVisibility(): void {
     // Filter by source first
-    this.svg.selectAll('.event')
-      .style('display', (d: TimelineEvent) => { // Change opacity to display
+    this.svg.selectAll<SVGGElement, TimelineEvent>('.event') // Explicitly type the selection
+      .style('display', (d: TimelineEvent) => { // Type d explicitly
         const sourceId = sources.find(s => s.name === d.source)?.id;
         return (!sourceId || !this.selectedSources.has(sourceId)) ? 'none' : 'block'; // Use 'none' to hide and 'block' to show
       });
 
     // Then filter by character if any are selected
     if (this.selectedCharacters.size > 0) {
-      this.svg.selectAll('.event')
-        .style('display', (d: TimelineEvent) => {
-          // If already hidden by source filter, keep it hidden
-          const sourceId = sources.find(s => s.name === d.source)?.id;
-          if (!sourceId || !this.selectedSources.has(sourceId)) {
-            return 'none';
-          }
+      this.svg.selectAll<SVGGElement, TimelineEvent>('.event') // Explicitly type the selection
+        .filter((d: TimelineEvent): boolean => { // Explicit boolean return type
+            const sourceId = sources.find(s => s.name === d.source)?.id;
+            return !!(sourceId && this.selectedSources.has(sourceId)); // Ensure boolean return
+        })
+        .style('display', (d: TimelineEvent) => { // Type d explicitly
+          // Source visibility is already checked by the filter above
 
           const eventCharacters = d.characters || [];
-          const relatedCharacters = characters
+          const relatedCharactersFromEvents = characters
             .filter(char => char.relatedEvents.includes(d.id))
             .map(char => char.id);
 
           const hasSelectedCharacter = [...this.selectedCharacters].some(charId => {
             const character = characters.find(c => c.id === charId);
             return character && (
-              relatedCharacters.includes(charId) ||
+              relatedCharactersFromEvents.includes(charId) ||
               (character.name && eventCharacters.includes(character.name))
             );
           });
@@ -1237,8 +1244,8 @@ export class Timeline {
   }
 
   private updatePeriodVisibility(): void {
-    this.svg.selectAll('.period-bg, .period-label')
-      .style('display', (d: TimelinePeriod) => {
+    this.svg.selectAll<SVGElement, TimelinePeriod>('.period-bg, .period-label') // Explicitly type the selection
+      .style('display', (d: TimelinePeriod) => { // Type d explicitly
         const sourceId = sources.find(s => s.name === d.source)?.id;
         return (!sourceId || !this.selectedSources.has(sourceId)) ? 'none' : 'block';
       });
